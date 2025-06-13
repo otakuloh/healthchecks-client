@@ -124,10 +124,6 @@ jobs:
           sudo apt update
           sudo apt install -y goreleaser
           goreleaser --version
-      - env:
-          GITHUB_TOKEN: ${{ github.token }}
-        name: Run goreleaser
-        run: goreleaser release --release-notes CHANGELOG.md --clean
       - name: Build docker
         uses: meysam81/build-docker@main
         with:
@@ -147,6 +143,10 @@ jobs:
             ghcr.io/${{ github.repository }}:${{ needs.release-please.outputs.tag_name }}
             ${{ github.repository }}:${{ needs.release-please.outputs.tag_name }}
           kubescape: true
+      - env:
+          GITHUB_TOKEN: ${{ github.token }}
+        name: Run goreleaser
+        run: goreleaser release --release-notes CHANGELOG.md --clean
 
   lychee:
     runs-on: ubuntu-latest

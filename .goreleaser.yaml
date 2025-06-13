@@ -8,7 +8,6 @@ project_name: healthchecks-client
 before:
   hooks:
     - go mod download
-    - go generate ./...
 
 builds:
   - env:
