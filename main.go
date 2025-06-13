@@ -190,11 +190,11 @@ func (a *AppState) createRootCommand() *cli.Command {
 
 func main() {
 	ctx := context.Background()
-	a := newAppState()
-	a.logger.Debug().Msg("Starting the app.")
+	app := newAppState()
+	app.logger.Debug().Msg("Starting the app.")
 
-	cmd := a.createRootCommand()
+	cmd := app.createRootCommand()
 	if err := cmd.Run(ctx, os.Args); err != nil {
-		a.logger.Fatal().Err(err).Msg("Application failed")
+		app.logger.Fatal().Err(err).Msg("Application failed")
 	}
 }

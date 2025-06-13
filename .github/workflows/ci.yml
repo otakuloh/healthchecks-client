@@ -126,6 +126,7 @@ jobs:
           goreleaser --version
       - env:
           GITHUB_TOKEN: ${{ github.token }}
+          COSIGN_EXPERIMENTAL: 1
         name: Run goreleaser
         run: goreleaser release --release-notes CHANGELOG.md --clean
 
