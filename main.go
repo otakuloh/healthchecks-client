@@ -54,7 +54,11 @@ func performHealthcheck(client *http.Client, config HealthcheckConfig) (int, err
 	if err != nil {
 		return 1, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log the error but don't fail the operation
+		}
+	}()
 
 	if resp.StatusCode != config.StatusCode {
 		return 1, nil
@@ -80,7 +84,11 @@ func executeHTTPCheck(ctx context.Context, config HealthcheckConfig, logger *log
 	if err != nil {
 		return fmt.Errorf("failed to send ping result: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			logger.Warn().Err(closeErr).Msg("Failed to close response body")
+		}
+	}()
 
 	logger.Info().Msgf("ping url result: %s", resp.Status)
 	return nil
