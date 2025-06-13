@@ -40,8 +40,6 @@ builds:
 
 archives:
   - id: default
-    builds:
-      - default
     formats:
       - tar.gz
     name_template: >-
@@ -54,10 +52,6 @@ archives:
       - goos: windows
         formats:
           - zip
-    files:
-      - README.md
-      - LICENSE*
-      - CHANGELOG.md
 
 changelog:
   sort: asc
