@@ -127,24 +127,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         name: Run goreleaser
         run: goreleaser release --release-notes CHANGELOG.md --clean
-      - name: Build docker
-        uses: meysam81/build-docker@main
-        with:
-          cache-from: type=local,src=/tmp/dockercache
-          cache-to: type=local,dest=/tmp/dockercache
-          checkout: false
-          cosign: true
-          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
-          dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          image-name: ghcr.io/${{ github.repository }}
-          image-extra-tags: |
-            ghcr.io/${{ github.repository }}:${{ needs.release-please.outputs.tag_name }}
-            ${{ github.repository }}:${{ needs.release-please.outputs.tag_name }}
-          kubescape: true
-          metadata-tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
 
   lychee:
     runs-on: ubuntu-latest

@@ -124,6 +124,8 @@ dockers:
     use: buildx
     build_flag_templates:
       - "--platform=linux/amd64,linux/arm64"
+      - "--cache-from=type=local,src=/tmp/dockercache"
+      - "--cache-to=type=local,dest=/tmp/dockercache"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
