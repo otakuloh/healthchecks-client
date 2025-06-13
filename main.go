@@ -29,9 +29,15 @@ type HealthcheckConfig struct {
 	StatusCode int
 }
 
-func newLogger() *logging.Logger {
+type AppState struct {
+	logger *logging.Logger
+}
+
+func newAppState() *AppState {
 	logger := logging.NewLogger()
-	return &logger
+	return &AppState{
+		logger: &logger,
+	}
 }
 
 func createHTTPClient(timeout time.Duration) *http.Client {
@@ -49,14 +55,14 @@ func sendPingResult(client *http.Client, pingURL string, exitCode int) (*http.Re
 	return client.Get(fmt.Sprintf("%s/%d", pingURL, exitCode))
 }
 
-func performHealthcheck(client *http.Client, config HealthcheckConfig) (int, error) {
+func (a *AppState) performHealthcheck(client *http.Client, config HealthcheckConfig) (int, error) {
 	resp, err := client.Get(config.Target)
 	if err != nil {
 		return 1, err
 	}
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
-			// Log the error but don't fail the operation
+			a.logger.Warn().Err(closeErr).Msg("Failed to close response body")
 		}
 	}()
 
@@ -67,16 +73,16 @@ func performHealthcheck(client *http.Client, config HealthcheckConfig) (int, err
 	return 0, nil
 }
 
-func executeHTTPCheck(ctx context.Context, config HealthcheckConfig, logger *logging.Logger) error {
+func (a *AppState) executeHTTPCheck(ctx context.Context, config HealthcheckConfig) error {
 	client := createHTTPClient(config.Timeout)
 
 	if err := sendPingStart(client, config.PingURL); err != nil {
-		logger.Warn().Err(err).Msg("Failed to send ping start")
+		a.logger.Warn().Err(err).Msg("Failed to send ping start")
 	}
 
-	exitCode, err := performHealthcheck(client, config)
+	exitCode, err := a.performHealthcheck(client, config)
 	if err != nil {
-		logger.Error().Err(err).Msg("Healthcheck failed")
+		a.logger.Error().Err(err).Msg("Healthcheck failed")
 		exitCode = 1
 	}
 
@@ -86,15 +92,15 @@ func executeHTTPCheck(ctx context.Context, config HealthcheckConfig, logger *log
 	}
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
-			logger.Warn().Err(closeErr).Msg("Failed to close response body")
+			a.logger.Warn().Err(closeErr).Msg("Failed to close response body")
 		}
 	}()
 
-	logger.Info().Msgf("ping url result: %s", resp.Status)
+	a.logger.Info().Msgf("ping url result: %s", resp.Status)
 	return nil
 }
 
-func createHTTPCheckCommand(logger *logging.Logger) *cli.Command {
+func (a *AppState) createHTTPCheckCommand() *cli.Command {
 	var config HealthcheckConfig
 	var timeoutSeconds int
 
@@ -140,7 +146,7 @@ func createHTTPCheckCommand(logger *logging.Logger) *cli.Command {
 
 			switch config.Method {
 			case "GET":
-				return executeHTTPCheck(ctx, config, logger)
+				return a.executeHTTPCheck(ctx, config)
 			default:
 				return fmt.Errorf("%s http method not supported at the moment", config.Method)
 			}
@@ -164,7 +170,7 @@ func createVersionCommand() *cli.Command {
 	}
 }
 
-func createRootCommand(logger *logging.Logger) *cli.Command {
+func (a *AppState) createRootCommand() *cli.Command {
 	return &cli.Command{
 		Name:        "healthchecks-client",
 		Usage:       "a client for healtchecks.io",
@@ -176,7 +182,7 @@ func createRootCommand(logger *logging.Logger) *cli.Command {
 		Suggest:               true,
 		EnableShellCompletion: true,
 		Commands: []*cli.Command{
-			createHTTPCheckCommand(logger),
+			a.createHTTPCheckCommand(),
 			createVersionCommand(),
 		},
 	}
@@ -184,11 +190,11 @@ func createRootCommand(logger *logging.Logger) *cli.Command {
 
 func main() {
 	ctx := context.Background()
-	logger := newLogger()
-	logger.Debug().Msg("Starting the app.")
+	a := newAppState()
+	a.logger.Debug().Msg("Starting the app.")
 
-	cmd := createRootCommand(logger)
+	cmd := a.createRootCommand()
 	if err := cmd.Run(ctx, os.Args); err != nil {
-		logger.Fatal().Err(err).Msg("Application failed")
+		a.logger.Fatal().Err(err).Msg("Application failed")
 	}
 }
