@@ -51,6 +51,11 @@ jobs:
       - name: Build docker
         uses: meysam81/build-docker@main
         with:
+          build-args: |
+            VERSION=dev-${{ github.sha }}
+            COMMIT=${{ github.sha }}
+            DATE=${{ github.event.head_commit.timestamp }}
+            BUILT_BY=github-actions
           cache-from: type=local,src=/tmp/dockercache
           cache-to: type=local,dest=/tmp/dockercache
           checkout: false

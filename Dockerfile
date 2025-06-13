@@ -10,13 +10,18 @@ RUN --mount=type=bind,source=go.mod,target=go.mod \
 
 FROM golang:1.24 AS builder
 
+ARG VERSION=dev
+ARG COMMIT=none
+ARG DATE=unknown
+ARG BUILT_BY=docker
+
 WORKDIR /app
 
 ENV CGO_ENABLED=0
 
 COPY . .
 RUN --mount=type=cache,target=/go/pkg/mod \
-  go build -ldflags="-s -w -extldflags '-static'" -trimpath -o healthchecks-client
+  go build -ldflags="-s -w -extldflags '-static' -X main.version=${VERSION} -X main.commit=${COMMIT} -X main.date=${DATE} -X main.builtBy=${BUILT_BY}" -trimpath -o healthchecks-client
 
 FROM scratch AS final
 
