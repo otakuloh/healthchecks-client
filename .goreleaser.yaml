@@ -118,35 +118,6 @@ checksum:
   name_template: checksums.txt
   algorithm: sha256
 
-dockers:
-  - image_templates:
-      - "ghcr.io/meysam81/{{ .ProjectName }}:{{ .Version }}"
-      - "meysam81/{{ .ProjectName }}:{{ .Version }}"
-    dockerfile: Dockerfile.goreleaser
-    use: buildx
-    build_flag_templates:
-      - "--platform=linux/amd64,linux/arm64"
-      - "--cache-from=type=local,src=/tmp/dockercache"
-      - "--build-arg=VERSION={{.Version}}"
-      - "--build-arg=COMMIT={{.Commit}}"
-      - "--build-arg=DATE={{.Date}}"
-      - "--build-arg=BUILT_BY=goreleaser"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-
-docker_signs:
-  - cmd: cosign
-    args:
-      - sign
-      - --yes
-      - ${artifact}
-    output: true
-    env:
-      - COSIGN_EXPERIMENTAL=1
-
 sboms:
   - id: archive
     artifacts: archive

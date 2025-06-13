@@ -126,9 +126,27 @@ jobs:
           goreleaser --version
       - env:
           GITHUB_TOKEN: ${{ github.token }}
-          COSIGN_EXPERIMENTAL: 1
         name: Run goreleaser
         run: goreleaser release --release-notes CHANGELOG.md --clean
+      - name: Build docker
+        uses: meysam81/build-docker@main
+        with:
+          build-args: |
+            VERSION=${{ needs.release-please.outputs.tag_name }}
+            COMMIT=${{ github.sha }}
+            DATE=${{ github.event.head_commit.timestamp }}
+            BUILT_BY=github-actions
+          cache-from: type=local,src=/tmp/dockercache
+          cache-to: type=local,dest=/tmp/dockercache
+          checkout: false
+          cosign: true
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          image-name: ghcr.io/${{ github.repository }}
+          image-extra-tags: |
+            ghcr.io/${{ github.repository }}:${{ needs.release-please.outputs.tag_name }}
+            ${{ github.repository }}:${{ needs.release-please.outputs.tag_name }}
+          kubescape: true
 
   lychee:
     runs-on: ubuntu-latest
