@@ -1,0 +1,16 @@
+exclude = [
+  "https://github.com/meysam81/healthchecks-client/compare/v1.0.0...v1.1.0",
+]
+
+exclude_path = [
+]
+
+accept = []
+
+cache = true
+
+max_cache_age = "7d"
+
+timeout = 10
+
+user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0"
