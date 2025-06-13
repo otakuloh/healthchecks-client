@@ -30,13 +30,13 @@ type HealthcheckConfig struct {
 }
 
 type AppState struct {
-	logger *logging.Logger
+	l *logging.Logger
 }
 
 func newAppState() *AppState {
 	logger := logging.NewLogger()
 	return &AppState{
-		logger: &logger,
+		l: &logger,
 	}
 }
 
@@ -62,7 +62,7 @@ func (a *AppState) performHealthcheck(client *http.Client, config HealthcheckCon
 	}
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
-			a.logger.Warn().Err(closeErr).Msg("Failed to close response body")
+			a.l.Warn().Err(closeErr).Msg("Failed to close response body")
 		}
 	}()
 
@@ -77,12 +77,12 @@ func (a *AppState) executeHTTPCheck(ctx context.Context, config HealthcheckConfi
 	client := createHTTPClient(config.Timeout)
 
 	if err := sendPingStart(client, config.PingURL); err != nil {
-		a.logger.Warn().Err(err).Msg("Failed to send ping start")
+		a.l.Warn().Err(err).Msg("Failed to send ping start")
 	}
 
 	exitCode, err := a.performHealthcheck(client, config)
 	if err != nil {
-		a.logger.Error().Err(err).Msg("Healthcheck failed")
+		a.l.Error().Err(err).Msg("Healthcheck failed")
 		exitCode = 1
 	}
 
@@ -92,11 +92,11 @@ func (a *AppState) executeHTTPCheck(ctx context.Context, config HealthcheckConfi
 	}
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
-			a.logger.Warn().Err(closeErr).Msg("Failed to close response body")
+			a.l.Warn().Err(closeErr).Msg("Failed to close response body")
 		}
 	}()
 
-	a.logger.Info().Msgf("ping url result: %s", resp.Status)
+	a.l.Info().Msgf("ping url result: %s", resp.Status)
 	return nil
 }
 
@@ -191,10 +191,10 @@ func (a *AppState) createRootCommand() *cli.Command {
 func main() {
 	ctx := context.Background()
 	app := newAppState()
-	app.logger.Debug().Msg("Starting the app.")
+	app.l.Debug().Msg("Starting the app.")
 
 	cmd := app.createRootCommand()
 	if err := cmd.Run(ctx, os.Args); err != nil {
-		app.logger.Fatal().Err(err).Msg("Application failed")
+		app.l.Fatal().Err(err).Msg("Application failed")
 	}
 }
