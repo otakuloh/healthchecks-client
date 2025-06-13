@@ -122,12 +122,11 @@ dockers:
   - image_templates:
       - "ghcr.io/meysam81/{{ .ProjectName }}:{{ .Version }}"
       - "meysam81/{{ .ProjectName }}:{{ .Version }}"
-    dockerfile: Dockerfile
+    dockerfile: Dockerfile.goreleaser
     use: buildx
     build_flag_templates:
       - "--platform=linux/amd64,linux/arm64"
       - "--cache-from=type=local,src=/tmp/dockercache"
-      - "--cache-to=type=local,dest=/tmp/dockercache"
       - "--build-arg=VERSION={{.Version}}"
       - "--build-arg=COMMIT={{.Commit}}"
       - "--build-arg=DATE={{.Date}}"
